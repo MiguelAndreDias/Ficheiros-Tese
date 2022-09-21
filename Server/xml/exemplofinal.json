@@ -1,0 +1,266 @@
+{
+	"themeColor": "default",
+	"templateName": "Upload Documentos",
+	"templateId": "0a442b13-f1dc-4ccc-8c4e-075e5a2397ad",
+	"rm_type_name": "COMPOSITION",
+	"occurrences": {
+		"lowerOccurrences": 1,
+		"upperOccurrences": 1
+	},
+	"archetypeId": "openEHR-EHR-COMPOSITION.report.v1",
+	"path": "[openEHR-EHR-COMPOSITION.report.v1]",
+	"node": {
+		"code": "at0000",
+		"text": "Upload documentos",
+		"description": "Documento para transmitir informações a outras pessoas, geralmente como resposta a uma solicitação."
+	},
+	"items": [
+		[
+			{
+				"path": "[openEHR-EHR-COMPOSITION.report.v1]/[at0002]",
+				"node": {
+					"code": "at0002",
+					"text": "Relatório ID",
+					"description": "Informações sobre a identificação do relatório."
+				},
+				"dataType": "DV_TEXT",
+				"occurrences": {
+					"lowerOccurrences": 0,
+					"upperOccurrences": 1
+				},
+				"value": null
+			},
+			{
+				"occurrences": {
+					"lowerOccurrences": 0,
+					"upperOccurrences": 1
+				},
+				"xsi_type": "C_ARCHETYPE_ROOT",
+				"archetype_id": "openEHR-EHR-ACTION.service.v0",
+				"path": "[openEHR-EHR-COMPOSITION.report.v1]/[openEHR-EHR-ACTION.service.v0]",
+				"node": {
+					"code": "at0000",
+					"text": "Serviço",
+					"description": "Actividade clínica geral direccionada para o utente, de forma a que este possa receber um serviço, conselho ou atendimento especificado de um profissional de saúde especializado."
+				},
+				"items": [
+					{
+						"path": "[openEHR-EHR-COMPOSITION.report.v1]/[openEHR-EHR-ACTION.service.v0]/[532]",
+						"node": {
+							"code": 532,
+							"text": "Concluída"
+						},
+						"dataType": "DV_CODED_TEXT",
+						"terminology_id": "local",
+						"itemsList": [
+							{
+								"code": "at0005",
+								"text": "Actividade do serviço completa",
+								"description": "Todas as actividades do serviço foram concluídas"
+							}
+						],
+						"occurrences": {
+							"lowerOccurrences": 0,
+							"upperOccurrences": 1
+						},
+						"value": null
+					},
+					{
+						"path": "[openEHR-EHR-COMPOSITION.report.v1]/[openEHR-EHR-ACTION.service.v0]/[at0011]",
+						"node": {
+							"code": "at0011",
+							"text": "Tipo de documento",
+							"description": "Identificação do serviço clínico a ser realizado ou em execução."
+						},
+						"dataType": "DV_CODED_TEXT",
+						"terminology_id": "SNOMED",
+						"itemsList": [
+							{
+								"code": "SNOMED::307808008",
+								"text": "Avaliação Neuropsicológica"
+							},
+							{
+								"code": "SNOMED::371531000",
+								"text": "Relatório clínico"
+							},
+							{
+								"code": "SNOMED::4201000179104",
+								"text": "Relatório de MCD"
+							},
+							{
+								"code": "SNOMED::416779005",
+								"text": "Registo Anestésico"
+							},
+							{
+								"code": "SNOMED::1",
+								"text": "Registo de transfusão"
+							},
+							{
+								"code": "SNOMED::2",
+								"text": "Telefonema do dia anterior"
+							},
+							{
+								"code": "SNOMED::3",
+								"text": "Telefonema dia seguinte"
+							},
+							{
+								"code": "SNOMED::4",
+								"text": "Telefonema dos 30 dias"
+							},
+							{
+								"code": "SNOMED::5",
+								"text": "Medicamentos hemoderivados"
+							},
+							{
+								"code": "SNOMED::761938008",
+								"text": "Prescrição e Requisição de antídotos"
+							},
+							{
+								"code": "SNOMED::6",
+								"text": "Informação Social"
+							},
+							{
+								"code": "SNOMED::7",
+								"text": "Consentimento Informado"
+							},
+							{
+								"code": "SNOMED::8",
+								"text": "Impresso de consumo"
+							},
+							{
+								"code": "SNOMED::9",
+								"text": "Espólio"
+							}
+						],
+						"occurrences": {
+							"lowerOccurrences": 0,
+							"upperOccurrences": 1
+						},
+						"value": null
+					},
+					{
+						"occurrences": {
+							"lowerOccurrences": 0,
+							"upperOccurrences": 1
+						},
+						"archetype_id": "openEHR-EHR-CLUSTER.media_file.v1",
+						"path": "[openEHR-EHR-COMPOSITION.report.v1]/[openEHR-EHR-ACTION.service.v0]/[openEHR-EHR-CLUSTER.media_file.v1]",
+						"node": {
+							"code": "at0000",
+							"text": "Ficheiro de media",
+							"description": "O ficheiro multimédia que adquirido ou utilizado como parte do processo de cuidados e associado a metadados"
+						},
+						"items": [
+							{
+								"path": "[openEHR-EHR-COMPOSITION.report.v1]/[openEHR-EHR-ACTION.service.v0]/[openEHR-EHR-CLUSTER.media_file.v1]/[at0001]",
+								"node": {
+									"code": "at0001",
+									"text": "Ficheiro",
+									"description": "Representação do ficheiro multimédia"
+								},
+								"dataType": "DV_MULTIMEDIA",
+								"occurrences": {
+									"lowerOccurrences": 0,
+									"upperOccurrences": 1
+								},
+								"value": null,
+								"itemsList": "application/pdf"
+							},
+							{
+								"path": "[openEHR-EHR-COMPOSITION.report.v1]/[openEHR-EHR-ACTION.service.v0]/[openEHR-EHR-CLUSTER.media_file.v1]/[at0002]",
+								"node": {
+									"code": "at0002",
+									"text": "Nome do ficheiro",
+									"description": "Nome ou título do ficheiro"
+								},
+								"dataType": "DV_TEXT",
+								"occurrences": {
+									"lowerOccurrences": 0,
+									"upperOccurrences": 1
+								},
+								"value": null
+							},
+							{
+								"path": "[openEHR-EHR-COMPOSITION.report.v1]/[openEHR-EHR-ACTION.service.v0]/[openEHR-EHR-CLUSTER.media_file.v1]/[at0010]",
+								"constraints": [
+									{
+										"path": "[openEHR-EHR-COMPOSITION.report.v1]/[openEHR-EHR-ACTION.service.v0]/[openEHR-EHR-CLUSTER.media_file.v1]/[at0010]",
+										"field": "items[at0010]",
+										"rm_attribute_name": "value",
+										"default_dataType": "DV_IDENTIFIER"
+									}
+								],
+								"node": {
+									"code": "at0010",
+									"text": "Identificador",
+									"description": "ID unívoco para este ficheiro"
+								},
+								"dataType": "DV_IDENTIFIER",
+								"occurrences": {
+									"lowerOccurrences": 0,
+									"upperOccurrences": "*"
+								},
+								"value": null
+							},
+							{
+								"path": "[openEHR-EHR-COMPOSITION.report.v1]/[openEHR-EHR-ACTION.service.v0]/[openEHR-EHR-CLUSTER.media_file.v1]/[at0005]",
+								"node": {
+									"code": "at0005",
+									"text": "Descrição",
+									"description": "Descriição sobre o ficheiro"
+								},
+								"dataType": "DV_TEXT",
+								"occurrences": {
+									"lowerOccurrences": 0,
+									"upperOccurrences": 1
+								},
+								"value": null
+							},
+							{
+								"path": "[openEHR-EHR-COMPOSITION.report.v1]/[openEHR-EHR-ACTION.service.v0]/[openEHR-EHR-CLUSTER.media_file.v1]/[at0004]",
+								"node": {
+									"code": "at0004",
+									"text": "Data do relatório",
+									"description": "Período, data ou data parcial quando o ficheiro foi gerado ou produzido"
+								},
+								"dataType": "DV_DATE_TIME",
+								"occurrences": {
+									"lowerOccurrences": 0,
+									"upperOccurrences": 1
+								},
+								"value": {
+									"date": null,
+									"time": null
+								}
+							},
+							{
+								"path": "[openEHR-EHR-COMPOSITION.report.v1]/[openEHR-EHR-ACTION.service.v0]/[openEHR-EHR-CLUSTER.media_file.v1]/[at0007]",
+								"node": {
+									"code": "at0007",
+									"text": "Comentários",
+									"description": "Notas adicionais sobre o ficheiro não capturados noutro campo"
+								},
+								"dataType": "DV_TEXT",
+								"occurrences": {
+									"lowerOccurrences": 0,
+									"upperOccurrences": 1
+								},
+								"value": null
+							}
+						],
+						"cardinality": {
+							"ordered": false,
+							"unique": false,
+							"interval": {
+								"lowerOccurrences": 1,
+								"upperOccurrences": "*"
+							}
+						},
+						"data_type": "Title"
+					}
+				],
+				"data_type": "Title"
+			}
+		]
+	]
+}
