@@ -4,12 +4,37 @@
 
 import {matchData} from './extraFunctions.js'
 
-
 export function createOntology(dataFile){
-    var resultadoOntology = matchData(/ontology[\w\W]*>/,  null ,dataFile)
+
+  //Resolução do bug com comentarios (remove os comentarios)
+ 
+  dataFile = dataFile.replaceAll(/comment = <.+>/g, '') //remove os comentarios formatados
+  dataFile = dataFile.replaceAll(/comment = <.+[^>]+>/g, '') //remove os comentarios mal formatados
+  
 
 
+    //Resolução do bug em que certos ficheiros têm o "> numa linha diferente
+    var regexErro = /description = <".+[\s]+">/g
+    var matchErro = dataFile.match(regexErro)
+    //console.log(matchErro)
+if(matchErro){
+
+  for(var i = 0; i < matchErro.length; i++){
+    //console.log(matchErro[i])
+    var matchResolvido = matchErro[i]
+    matchResolvido = matchResolvido.replaceAll(/[\r\n\t]/g, '')
+    //console.log(matchResolvido)
+    dataFile = dataFile.replace(matchErro[i], matchResolvido)
+  }
+ 
+}
     
+   
+    var resultadoOntology = matchData(/ontology[\w\W]*>/,  null ,dataFile, "ontology")
+    
+
+
+    //console.log(resultadoOntology)
 
 
     const ontologyProps = [ 'term_definitions :', 'items :', 'text :', 'description :', 'copyright :', 'comment :', 'terminologies_available :']
@@ -87,9 +112,23 @@ export function createOntology(dataFile){
 
     
     resultadoOntology = resultadoOntology + "}}}"
+    var regexConstraint = /constraint_definitions/
+    var constraintExists = regexConstraint.test(resultadoOntology)
+    
+    if(constraintExists){
+      resultadoOntology = resultadoOntology.replace("constraint_definitions", ',' + '"' + "constraint_definitions" + '"')
+    }
     
 
     return resultadoOntology
 
 }
   
+
+/*
+var resultado = createOntology(dataFile)
+console.log(resultado)
+resultado = JSON.parse(resultado)
+console.log(resultado)
+
+*/

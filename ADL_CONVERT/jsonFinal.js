@@ -1,7 +1,11 @@
 import {createHeader} from "./Header.js"
 import {createConcept} from "./Concept.js"
 import {createLanguage} from "./Language.js"
+import {createDescription} from "./Description.js"
 import {createOntology} from "./Ontology.js"
+import {createAllMatches} from "./Definition.js"
+
+import {convert64} from "./extraFunctions.js"
 
 //Needed to have both import and requires in the same file
 import { Console } from "console";
@@ -9,9 +13,74 @@ import {createRequire} from "module";
 const require = createRequire(import.meta.url);
 
 const fs = require('fs');
+import fetch, { Headers } from 'node-fetch';
+
 //read data file and put into a string
 
-var filename = "openEHR-DEMOGRAPHIC-CLUSTER.person_death_data_iso.v0.adl.txt"
+var filename = "openEHR-EHR-CLUSTER.waveform.v0.adl.txt"
+var filename = "rascunho.txt"
+
+
+
+//Abrir ficheiros por fetch request
+
+
+/* const url = "https://api.github.com/"
+const getRepoContent = "repos/gestaopedidosehr/CKM-mirror/contents/"
+const path = "local/archetypes/cluster/openEHR-EHR-CLUSTER.waveform.v0.adl"
+
+
+
+await fetch(url + getRepoContent + path , {
+headers: new Headers({
+    'Accept': 'application/vnd.github.v3+json',
+    'Authorization': 'Bearer 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',
+    
+    })
+}).then(res => res.json()).then(json => {
+  filename = json.content
+  console.log(filename)
+  filename = convert64(filename)
+
+  
+  
+
+
+}) */
+
+
+const url = "https://api.github.com/"
+const getRepoContent = "repos/gestaopedidosehr/CKM-mirror/contents/"
+const path = "local/archetypes/cluster/openEHR-EHR-CLUSTER.waveform.v0.adl"
+
+
+
+await fetch(url + getRepoContent + path , {
+headers: new Headers({
+    'Accept': 'application/vnd.github.v3+json',
+    'Authorization': 'Bearer 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',
+    
+    })
+}).then(res => res.json()).then(json => {
+  filename = json.content
+  console.log(filename)
+  filename = convert64(filename)
+
+  
+  
+
+
+})
+
+
+
+
+
+
+
+//Abrir ficheiros no diretorio
+
+
 
 try {
     const data = fs.readFileSync(filename, 'utf8')
@@ -20,14 +89,14 @@ try {
     console.error(err)
   }
 
-  
+
 
 export function createJson(dataFile){
     var Header = createHeader(dataFile)
     var Concept = createConcept(dataFile)
     var Language = createLanguage(dataFile)
-    //var Description = createDescription(dataFile)
-    //var Definition = createDefinition(dataFile)
+    var Description = createDescription(dataFile)
+    var objDefinitionInicial = createAllMatches(dataFile)
     var Ontology = createOntology(dataFile)
     
 
@@ -35,14 +104,20 @@ export function createJson(dataFile){
     var objHeader = JSON.parse(Header)
     var objConcept = JSON.parse(Concept)
     var objLanguage = JSON.parse(Language)
-    //var objDescription = JSON.parse(Description)
-    //var objDefinition = JSON.parse(Definition)
+    var objDescription = JSON.parse(Description)
     var objOntology = JSON.parse(Ontology)
+
+
+    var objDefinitionFinal = {"definition" : {}}
+    objDefinitionFinal.definition = objDefinitionInicial
+
 
     const mergedObject = {
       ...objHeader,
       ...objConcept,
       ...objLanguage,
+      ...objDescription,
+      ...objDefinitionFinal,
       ...objOntology
       
     };
@@ -52,5 +127,9 @@ export function createJson(dataFile){
 
 }
 
+
+/* 
 var resultado = createJson(filename)
+console.log(111111)
 console.log(resultado)
+console.log(111111) */
