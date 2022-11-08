@@ -292,9 +292,7 @@ function createItemsMatches(string, type = null){
     }
     else{
         var first = createNode(string)
-        console.log(9999)
-        console.log(first)
-        console.log(9999)
+   
     }
     
  
@@ -309,9 +307,7 @@ function createItemsMatches(string, type = null){
     
     var regexItems = /items[\d\D]+?matches {[\d\D]+/g
     var matchItems = string.match(regexItems)
-    console.log(12121212)
-    console.log(matchElements)
-    console.log(12121212)
+   
     matchItems = matchItems[0]
    
  
@@ -474,7 +470,7 @@ function createItemsMatches(string, type = null){
         }
         
         
-        console.log(objItemsFinal)
+        
   
             return objItemsFinal
 
@@ -574,7 +570,7 @@ export function createAllMatches(string){
         var firstNode = {}
         firstNode = createNode(string)
 
-        console.log(firstNode)
+        
         
         
         
@@ -594,7 +590,7 @@ export function createAllMatches(string){
         //Faz match dos diferentes tipos de matches existentes (Name matches, definition matches, protocol matches...)
         var regexMaType = /[a-z]+ matches\s+{.+?}(?=\s+[a-z]+ matches|$)/gs
         var matchMaType = string.match(regexMaType)
-        console.log(matchMaType)
+        
 
         
 
