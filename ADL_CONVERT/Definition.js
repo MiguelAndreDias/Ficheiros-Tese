@@ -11,23 +11,10 @@ const require = createRequire(import.meta.url);
 import estruturasDV from './Estruturas.js' 
 const fs = require('fs');
 import {createJson} from "./jsonFinal.js"
+import fetch, { Headers } from 'node-fetch';
+
 
 //read data file and put into a string
-
-
-/*
-var filename = "openEHR-EHR-CLUSTER.clinical_evidence.v1.adl.txt"
-
-try {
-    const data = fs.readFileSync(filename, 'utf8')
-    filename = data
-  } catch (err) {
-    console.error(err)
-  }
-*/
- 
-
-
 
 
 
@@ -60,6 +47,42 @@ try {
 //////////////////
 //DEFINITION MATCH
 //////////////////
+
+
+
+
+
+async function getRepository(rmType){
+
+
+    var url = "https://api.github.com/"
+    var getRepoContent = "repos/gestaopedidosehr/CKM-mirror/contents/local/archetypes/"
+
+        
+    var response = await fetch(url + getRepoContent + rmType   , {
+    headers: new Headers({
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': 'Bearer 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',
+        
+        })
+    });
+  
+    var data = await response.json();
+  
+    return data
+  
+  
+  
+  
+  }
+
+
+  var objRepo = await getRepository("cluster")
+  
+
+
+
+
 
 ////////////////////////
 //CREATE ONTOLOGY TERMS
@@ -257,6 +280,10 @@ if(string.includes("value matches")){
 
 
 
+
+
+
+
 function createItemsMatches(string, type = null){
 
     
@@ -324,7 +351,10 @@ function createItemsMatches(string, type = null){
 
                 }
 
+
+                ///////////////////
                 //INLCUDE ARCHETYPE
+                //////////////////
             else if(matchElements[i].includes("allow_archetype")){
                 console.log("inclui archetype")
                 var nodeAllowArchetype = createNode(matchElements[i])
@@ -332,17 +362,57 @@ function createItemsMatches(string, type = null){
                 console.log(nodeAllowArchetype)
 
 
+                //Match do regex dentro do include archetype
                 var regexInclude = /\/open.+\//
                 var matchInclude = matchElements[i].match(regexInclude)
                 matchInclude = matchInclude[0]
-                console.log(matchInclude)
+                
+                //Regex para saber o tipo RM para fazer fetch request
+                var regexRMType = /[A-Z]+?(?=\\\.)/
+                var matchRMType = matchInclude.match(regexRMType)
+                matchRMType = matchRMType[0]
+                console.log(matchRMType)
+                
+                
+                //Match do url de download para fazer o fetch
+                var stringRepo = JSON.stringify(objRepo)
+                var regexInclude = /openEHR-EHR-CLUSTER\.document_entry_metadata(-[a-zA-Z0-9_]+)*\.v1|openEHR-EHR-CLUSTER\.document_entry_metadata(-[a-zA-Z0-9_]+)*\.v0/
+                var matchInclude = stringRepo.match(regexInclude)
+                matchInclude = matchInclude[0]
 
-                &&&&777
+                
+                function getData(){
+                    var url2 = "https://raw.githubusercontent.com/gestaopedidosehr/CKM-mirror/master/local/archetypes/cluster/openEHR-EHR-CLUSTER.document_entry_metadata.v0.adl"
+                    var data = ""
+                    fetch(url2).then(res =>console.log(res.text())).then( r => console.log(r) )
+                    
+                   
+                  }
+                  
+                getData() 
 
 
 
 
-            }
+                
+
+
+
+       }
+
+
+
+
+
+
+
+
+               
+
+
+
+
+            
 
             else{
 
@@ -448,7 +518,7 @@ function createContextMatches(string){
     var objContext = {}
     var objItemsDetails = createItemsMatches(string)
     objContext["context_matches"] = []
-    objDetails["ontext_matches"].push(objItemsDetails)
+    objContext["context_matches"].push(objItemsDetails)
 
     return objContext
 }
@@ -479,10 +549,7 @@ function removeMatches(string){
 
 //Função que procura os matches e depois chama as outras funções em função do tipo de match que é
 export function createAllMatches(string){
-        console.log(1212212)
-        console.log(string)
-        console.log(1212212)
-
+      
       
         //Cria um objecto com os termos de Ontology 
         var objOntology = JSON.parse(createOntology(string))
@@ -544,11 +611,10 @@ export function createAllMatches(string){
             
             }
             else{
+                
                 var matchesFunction = objMatchCheck[matchFinalType]
                 var objMatch = matchesFunction(matchMaType[i])
-                console.log(878787878)
-                console.log(objMatch)
-                console.log(878787878)
+              
                 
             }
             
