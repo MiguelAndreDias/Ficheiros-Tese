@@ -3,6 +3,7 @@
 //////////////////////////
 
 
+
 export function createConcept(dataFile){
     var regexFixe = /concept[\w\W]*?language/
   const matchConcept = regexFixe.exec(dataFile)
@@ -10,7 +11,13 @@ export function createConcept(dataFile){
   resultadoConcept = resultadoConcept.replace('language','')
 
   resultadoConcept = resultadoConcept.replace(/concept/, '{' + '"concept"' + ':')
-  resultadoConcept = resultadoConcept.replace(/\[at0000\]/, '{' + '"at0000"' + ':')
+  var regexAT = /\[at.+\]/
+  var matchAT = resultadoConcept.match(regexAT)
+  matchAT = matchAT[0]
+  matchAT = matchAT.replace("[", "")
+  matchAT = matchAT.replace("]", "")
+
+  resultadoConcept = resultadoConcept.replace(/\[at.+\]/, '{' + '"' + matchAT + '"' + ':')
 
 
   var regexFixe = /-- \D.+/
@@ -20,3 +27,4 @@ export function createConcept(dataFile){
 return resultadoConcept
 
 }
+
