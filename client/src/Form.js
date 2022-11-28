@@ -15,19 +15,7 @@ export default function Form() {
         const payload= { id: 1, name:' Tom'};
         axios.post({method: 'post', url: '/test', data: JSON.stringify(payload)}).then(res => res.json())
         
-        
-        
-        
-        /*
 
-        
-        .then(function(response) {
-            
-            console.log(response.data)
-            setRepo(response.data.content)
-        })
-
-        */
     }
   return (
     <div>
