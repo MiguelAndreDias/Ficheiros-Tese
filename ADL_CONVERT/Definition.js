@@ -10,9 +10,11 @@ import {createRequire} from "module";
 const require = createRequire(import.meta.url);
 import estruturasDV from './Estruturas.js' 
 const fs = require('fs');
-import {createJson} from "./jsonFinal.js"
-import fetch, { Headers } from 'node-fetch';
-
+import {createJson, filename} from "./jsonFinal.js"
+//import fetch, { Headers } from 'node-fetch';
+import { match } from "assert";
+const fetch = require('sync-fetch')
+import {createHeader} from "./Header.js"
 
 //read data file and put into a string
 
@@ -52,48 +54,19 @@ try {
 
 
 
-async function getRepository(rmType){
-
-
-    var url = "https://api.github.com/"
-    var getRepoContent = "repos/gestaopedidosehr/CKM-mirror/contents/local/archetypes/"
-
-        
-    var response = await fetch(url + getRepoContent + rmType   , {
-    headers: new Headers({
-        'Accept': 'application/vnd.github.v3+json',
-        'Authorization': 'Bearer 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',
-        
-        })
-    });
-  
-    var data = await response.json();
-  
-    return data
-  
-  
-  
-  
-  }
-
-
-  var objRepo = await getRepository("cluster")
-  
-
-
-
-
-
 ////////////////////////
 //CREATE ONTOLOGY TERMS
 ////////////////////////
 
+var rmType = ""
 
 var ontologyItems = `
 
 Sem conteudo por enquanto a função createallmatches vai criar este objecto
  para ser usado na scope global em todas as funções`
 
+
+var fileArray = []
 
 
 
@@ -102,17 +75,20 @@ function createNode(string){
     var objNode = {}
 
     var regexNode = /[A-Z_ ]+\[at.+\].+matches.+{/
+
     var matchNode = string.match(regexNode)
     matchNode = matchNode[0]
 
+    
+
   
 
-    //rm_type 
+    //rmType
 
     var regexRMtype = /[A-Z_]+(?=\[)/
     var matchRMtype = matchNode.match(regexRMtype)
     matchRMtype = matchRMtype[0]
-    objNode["rm_type"] = matchRMtype
+    objNode["rmType"] = matchRMtype
     
     
 
@@ -149,7 +125,11 @@ function createNode(string){
      matchCode = matchCode.replace("]", "")
      objNode["node"] = {}
      objNode.node["code"] = matchCode
+    
+
      objNode.node["text"] = ontologyItems[matchCode]["text"]
+
+     
      objNode.node["description"] = ontologyItems[matchCode]["description"]
 
 
@@ -238,11 +218,10 @@ function createNameMatches(string){
     var regexDV = /DV[\w]+/g
     var matchDV = string.match(regexDV)
    
-   
+
    
     objName["name_matches"] = []
-    
-    
+  
     for(var i = 0; i < matchDV.length; i++){
 
         //Se for DVCODED_TEXT cria uma lista com os values e vai buscar os valores ao ontology
@@ -272,7 +251,10 @@ if(string.includes("value matches")){
     objName = JSON.parse(objName)
 }
     
+
     return objName
+
+
     
 
 }
@@ -280,7 +262,23 @@ if(string.includes("value matches")){
 
 
 
+function getRepository(rmType){
+    var url = "https://api.github.com/"
+    var getRepoContent = "repos/MiguelAndreDias/CKM-mirror/contents/local/archetypes/"
+    
+        
+    var response = fetch(url + getRepoContent + rmType   , {
+    headers: ({
+        'Accept': 'application/vnd.github.v3+json',
+        'Authorization': 'Bearer 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',
+        
+        })
+    });
+  
+    var data = response.text();
 
+    return data
+}
 
 
 
@@ -295,14 +293,14 @@ function createItemsMatches(string, type = null){
    
     }
     
- 
+
     var objItems = {}
     objItems["items"] = []
 
     
 
     
-    var regexElements = /CLUSTER\[at.+?\][\d\D]+?{[\d\D]+?items[\d\D]+?{.+?}|(ELEMENT\[at.+?\].+?})(?=\s*(?:ELEMENT|CLUSTER|allow_archetype|$))|(allow_archetype.+?})(?=\s*(?:ELEMENT|CLUSTER|allow_archetype|$))/gs
+    var regexElements = /CLUSTER\[at.+?\][\d\D]+?{[\d\D]+?items[\d\D]+?{|(ELEMENT\[at.+?\].+?})(?=\s*(?:ELEMENT|CLUSTER|allow_archetype|$))|(allow_archetype.+?})(?=\s*(?:ELEMENT|CLUSTER|allow_archetype|$))/gs
     var matchElements = string.match(regexElements)//DEPOIS USAR O MATCH ITEMS NA EXPRESSAO REGULAR PARA ACHAR OS CLUSTERS SEPARADOS
     
     var regexItems = /items[\d\D]+?matches {[\d\D]+/g
@@ -333,7 +331,9 @@ function createItemsMatches(string, type = null){
                 }
 
                 else{
+                  
                     var objElement = createNode(matchElements[i])
+               
                     var objELementValues = createNameMatches(matchElements[i])
 
                     objElement = {
@@ -349,70 +349,146 @@ function createItemsMatches(string, type = null){
 
 
                 ///////////////////
-                //INLCUDE ARCHETYPE
+                //INCLUDE ARCHETYPE
                 //////////////////
             else if(matchElements[i].includes("allow_archetype")){
                 console.log("inclui archetype")
+
+                //Criar o path
+                var path = createHeader(filename)
+                path = JSON.parse(path)
+                console.log(path.archetype.file_name)
+             
+   
+                //console.log(ontologyItems)
                 var nodeAllowArchetype = createNode(matchElements[i])
-                nodeAllowArchetype["include"] = {}
-                console.log(nodeAllowArchetype)
+                nodeAllowArchetype["xsi_type"] = "C_ARCHETYPE_ROOT"
+                nodeAllowArchetype["include"] = []
 
+              
+                
 
-                //Match do regex dentro do include archetype
-                var regexInclude = /\/open.+\//
-                var matchInclude = matchElements[i].match(regexInclude)
-                matchInclude = matchInclude[0]
+                //Ver o rm type do archetype a incluir
+                var regexRMtype = /(?<=openEHR-EHR-)\w+(?=\\\.)/
+                var rmType = matchElements[i].match(regexRMtype)
                 
-                //Regex para saber o tipo RM para fazer fetch request
-                var regexRMType = /[A-Z]+?(?=\\\.)/
-                var matchRMType = matchInclude.match(regexRMType)
-                matchRMType = matchRMType[0]
-                console.log(matchRMType)
-                
-                
-                //Match do url de download para fazer o fetch
-                var stringRepo = JSON.stringify(objRepo)
-                var regexInclude = /openEHR-EHR-CLUSTER\.document_entry_metadata(-[a-zA-Z0-9_]+)*\.v1|openEHR-EHR-CLUSTER\.document_entry_metadata(-[a-zA-Z0-9_]+)*\.v0/
-                var matchInclude = stringRepo.match(regexInclude)
-                matchInclude = matchInclude[0]
 
-                
-                function getData(){
-                    var url2 = "https://raw.githubusercontent.com/gestaopedidosehr/CKM-mirror/master/local/archetypes/cluster/openEHR-EHR-CLUSTER.document_entry_metadata.v0.adl"
-                    var data = ""
-                    fetch(url2).then(res =>console.log(res.text())).then( r => console.log(r) )
+                //Se não der match ignora o allow_archetype
+                //Caso em existe ficheiros cluster na pasta demographic porque por alguma razão
+                //a expressão regular é diferente
+                if(rmType == null){
+                    regexRMtype = /openEHR-DEMOGRAPHIC-CLUSTER/
+                    var existe = regexRMtype.test(matchElements[i])
+                    if(existe){
+                        rmType = "demographic"
+                    }
+                    else{
+                        break  
+                    }
                     
-                   
-                  }
                   
-                getData() 
+                }
 
+                else{
+                    rmType = rmType[0].toLowerCase()
+                }
 
-
+               
+                
 
                 
 
+                //fazer fetch do repositorio especifico ao rmType
+                var objRepositoryString = getRepository(rmType)
 
+               //Vai buscar a expressão regular no allow archetype
+                var regexOpenEHR = /\/openEHR.+\//g
+                var matchRegexOpenEHR = matchElements[i].match(regexOpenEHR)
+                matchRegexOpenEHR = matchRegexOpenEHR[0]
+
+                //Cria uma expressão regular com a anterior para ir buscar o link https ao repositorio selecionado
+                function getHTTPSRegex(filenameRegex, rmType){
+
+                    var url = "https:\/\/raw.githubusercontent\.com\/MiguelAndreDias\/CKM-mirror\/main\/local\/archetypes\/"
+                    //varia com o tipo de ficheiro
+                    filenameRegex = filenameRegex.substring(1)
+                    filenameRegex = filenameRegex.slice(0, -1)
+                    filenameRegex = "(" + filenameRegex + ")"
+                    
+                    //varia com a Regex de cada ficheiro
+                    rmType = rmType + "\/"
+                    var extension = "\.adl"
+
+                    var regexFinal = new RegExp(url + rmType + filenameRegex + extension, "g")
+                    return regexFinal
+
+                }
+
+               
+                var regexFetch = getHTTPSRegex(matchRegexOpenEHR, rmType)
+               
+                var matchFetch = objRepositoryString.match(regexFetch)
+               
+                if(matchFetch == null){
+                    
+                }
+                else{
+                    matchFetch = matchFetch[0]
+                    function fetchFileContent(httpsLink){
+
+                    var response = fetch(httpsLink)
+                    var data = response.text()
+                    return data
+                
+                    }
+
+                var fileinclude = fetchFileContent(matchFetch)
+                
+               
+
+                //Função recursiva
+                var includeArch = createJson(fileinclude)
+              
+                //Resolve o bug do ontology items mudar após cada iteração
+                //Assim chama a função novamente e cria um objecto novo com os dados do ficheiro anterior/original
+                fileArray.push(fileinclude)
+                if(fileArray.length == 1){
+                    var previousFile = fileArray[0]
+                }
+                else{
+                    var previousFile = fileArray.pop()
+                }
+                
+                var objOntology = JSON.parse(createOntology(previousFile))
+                ontologyItems = objOntology.ontology.term_definitions.en.items
+
+                
+                
+                /////////////////////////////////////
+                nodeAllowArchetype["include"].push(includeArch)
+                
+               
+                objItems["items"].push(nodeAllowArchetype)
+ 
+                }
+
+                
+                
+               
+                
+
+                
 
        }
 
-
-
-
-
-
-
-
-               
-
-
-
-
-            
+  
 
             else{
-
+                
+                console.log("NEWCLUSTER HERE!!!!!!!!!!!!!!!!!!!!!")
+               
                 var newCluster = createNode(matchElements[i])
+                
                 
                 newCluster["items"] = [] 
 
@@ -433,7 +509,7 @@ function createItemsMatches(string, type = null){
                     //////////////////////////////////////////////////////////////////////
                     
                     var objNewElement = createNode(matchClusterElements[j])
-
+              
                     var objELementValues = createNameMatches(matchClusterElements[j])
 
                     objNewElement = {
@@ -448,6 +524,7 @@ function createItemsMatches(string, type = null){
 
 
                 objItems["items"].push(newCluster)
+              
 
                
                  
@@ -470,8 +547,8 @@ function createItemsMatches(string, type = null){
         }
         
         
-        
-  
+        console.log(JSON.stringify(objItemsFinal))
+
             return objItemsFinal
 
 }}
@@ -490,9 +567,11 @@ function createItemsMatches(string, type = null){
 
 
 function createDetailsMatches(string){
-
+    
     var objDetails = {}
     var objItemsDetails = createItemsMatches(string)
+    
+
     objDetails["details_matches"] = []
     objDetails["details_matches"].push(objItemsDetails)
 
@@ -506,8 +585,15 @@ function createDetailsMatches(string){
 
 
 
+/* JUNTAR ESTAS FUNÇÕES!!!!! */
+function createProtocolMatches(string){
+    var objProtocol = {}
+    var objItemsDetails = createItemsMatches(string)
+    objProtocol["protocol matches"] = []
+    objProtocol["protocol matches"].push(objItemsDetails)
 
-
+    return objProtocol
+}
 
 
 function createContextMatches(string){
@@ -527,11 +613,60 @@ var objMatchCheck = {
     "description matches": createDetailsMatches,
     "credentials matches" : createDetailsMatches,
     "items matches" : createDetailsMatches,
-    "context matches" : createContextMatches
+    "context matches" : createContextMatches,
+    "ism_transition matches" : createTransitionMatches,
+    "protocol matches" : createProtocolMatches
   }
 
 
+function createTransitionMatches(string){
 
+    var objISMFinal = {}
+    objISMFinal["ism_transition"] = []
+
+    var regexISM = /ISM_TRANSITION\[at.+?\] matches\s+{.+?}(?=\s+ISM_TRANSITION\[at.+?\] matches|$)/gs
+    var matchISM = string.match(regexISM)
+
+    for(var i = 0; i < matchISM.length; i++){
+        var objNodeISM = createNode(matchISM[i])
+        
+        //buscar os current_state e careflow_state
+        var regexStateStep = /(current_state matches\s+{.+?}(?=\s+careflow_step matches|$))|(careflow_step matches[\d\D]+)/gs
+        var matchStateStep = matchISM[i].match(regexStateStep)
+
+        //Regex com os dvs
+        
+        var regexDV = /DV[\w]+/g
+        var matchDV = matchStateStep[0].match(regexDV)
+
+        if(matchDV == "DV_CODED_TEXT"){
+            var DVcoded = createDVCODED(matchStateStep[0])
+            objNodeISM["current_state"] = DVcoded
+        }
+        else{
+            DVcoded = estruturasDV[matchDV]
+            objNodeISM["current_state"] = DVcoded
+        }
+
+        matchDV = matchStateStep[1].match(regexDV)
+        if(matchDV == "DV_CODED_TEXT"){
+            var DVcoded = createDVCODED(matchStateStep[1])
+            objNodeISM["careflow_step"] = DVcoded
+        }
+        else{
+            var DVtext = estruturasDV[matchDV]
+            objNodeISM["careflow_step"] = DVcoded
+        }
+
+        objISMFinal["ism_transition"].push(objNodeISM)
+   
+        
+    }
+
+
+    return objISMFinal
+    
+}
 
 
 function removeMatches(string){
@@ -545,11 +680,18 @@ function removeMatches(string){
 
 //Função que procura os matches e depois chama as outras funções em função do tipo de match que é
 export function createAllMatches(string){
-      
+
+        if(fileArray.includes(filename)){
+
+        }
+        else{
+            fileArray.push(filename)
+        }
       
         //Cria um objecto com os termos de Ontology 
         var objOntology = JSON.parse(createOntology(string))
         ontologyItems = objOntology.ontology.term_definitions.en.items
+       
 
         if(JSON.stringify(objOntology).includes("constraint_definitions")){
             var ontologyConstraints = objOntology.ontology.constraint_definitions.en.items
@@ -569,8 +711,9 @@ export function createAllMatches(string){
         //Cria o primeiro node
         var firstNode = {}
         firstNode = createNode(string)
-
         
+        
+       
         
         
         
@@ -588,7 +731,7 @@ export function createAllMatches(string){
 
         
         //Faz match dos diferentes tipos de matches existentes (Name matches, definition matches, protocol matches...)
-        var regexMaType = /[a-z]+ matches\s+{.+?}(?=\s+[a-z]+ matches|$)/gs
+        var regexMaType = /[a-z_]+ matches\s+{.+?}(?=\s+[a-z]+ matches|$)/gs
         var matchMaType = string.match(regexMaType)
         
 
@@ -597,34 +740,41 @@ export function createAllMatches(string){
         
         for (var i = 0 ; i < matchMaType.length; i++){
         
-            var regexMaType = /[a-z]+ matches/  //só é necessario a primeira instancia logo não se põe o "g"
+            var regexMaType = /[a-z_]+ matches/  //só é necessario a primeira instancia logo não se põe o "g"
             var matchFinalType = matchMaType[i].match(regexMaType)
             matchFinalType = matchFinalType[0]
 
-            if(firstNode.rm_type == "CLUSTER"){
-            
+            if(firstNode.rmType == "CLUSTER"){
+                
                 var objMatch = createItemsMatches(matchMaType[i], "CLUSTER")
             
             }
             else{
-                
+             
                 var matchesFunction = objMatchCheck[matchFinalType]
+               
+              
                 var objMatch = matchesFunction(matchMaType[i])
+
+                
+              
               
                 
             }
             
 
-            
             var objAllMatches = {
-            ...firstNode,
-            ...objAllMatches,
-            ...objMatch
-            };
+                ...firstNode,
+                ...objAllMatches,
+                ...objMatch
+                };
+            
 
             
 
         }
+
+       
 
         return objAllMatches
 

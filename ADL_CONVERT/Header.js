@@ -2,6 +2,14 @@
 //Archetype header match
 ////////////////////////
 
+
+//Needed to have both import and requires in the same file
+import { Console } from "console";
+import {createRequire} from "module";
+const require = createRequire(import.meta.url);
+
+const fs = require('fs');
+
 export function createHeader(dataFile){
     var regexFixe = /archetype[\w\W]*?concept/
     const matchHeader = regexFixe.exec(dataFile)
@@ -32,5 +40,31 @@ export function createHeader(dataFile){
     
     
     resultadoHeader = resultadoHeader.replace(';',',')
+
+    //Tira o specialise que alguns ficheiros têm
+    resultadoHeader = resultadoHeader.replace(/specialise\s+openEHR.+/, "")
     return resultadoHeader
   }
+
+
+
+   var filename = "rascunho.txt"
+
+try {
+    const data = fs.readFileSync(filename, 'utf8')
+    filename = data
+  } catch (err) {
+    console.error(err)
+  }
+
+/* console.log(filename)
+var resultado = createHeader(filename)
+console.log(resultado)
+console.log(111111)
+resultado = JSON.parse(resultado)
+console.log(22222222)
+
+console.log(JSON.stringify(resultado))
+console.log(resultado)
+
+  */

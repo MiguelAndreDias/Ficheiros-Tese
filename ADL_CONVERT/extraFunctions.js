@@ -18,3 +18,10 @@ export function matchData(regex, remove, string){
     return resultado
   
   }
+
+
+export function convert64(base64encoded){
+    var utf8encoded = Buffer.from(base64encoded, 'base64').toString('utf8');
+    return utf8encoded
+
+}

@@ -17,8 +17,8 @@ import fetch, { Headers } from 'node-fetch';
 
 //read data file and put into a string
 
-var filename = "openEHR-EHR-CLUSTER.waveform.v0.adl.txt"
-var filename = "rascunho.txt"
+//var filename = "openEHR-EHR-CLUSTER.waveform.v0.adl.txt"
+
 
 
 
@@ -49,28 +49,6 @@ headers: new Headers({
 }) */
 
 
-const url = "https://api.github.com/"
-const getRepoContent = "repos/gestaopedidosehr/CKM-mirror/contents/"
-const path = "local/archetypes/cluster/openEHR-EHR-CLUSTER.waveform.v0.adl"
-
-
-
-await fetch(url + getRepoContent + path , {
-headers: new Headers({
-    'Accept': 'application/vnd.github.v3+json',
-    'Authorization': 'Bearer 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',
-    
-    })
-}).then(res => res.json()).then(json => {
-  filename = json.content
-  console.log(filename)
-  filename = convert64(filename)
-
-  
-  
-
-
-})
 
 
 
@@ -80,7 +58,7 @@ headers: new Headers({
 
 //Abrir ficheiros no diretorio
 
-
+export var filename = "rascunho.txt"
 
 try {
     const data = fs.readFileSync(filename, 'utf8')
@@ -91,7 +69,13 @@ try {
 
 
 
+  
+
 export function createJson(dataFile){
+
+
+
+  
     var Header = createHeader(dataFile)
     var Concept = createConcept(dataFile)
     var Language = createLanguage(dataFile)
@@ -128,8 +112,9 @@ export function createJson(dataFile){
 }
 
 
-/* 
+
 var resultado = createJson(filename)
 console.log(111111)
 console.log(resultado)
-console.log(111111) */
+console.log(JSON.stringify(resultado))
+console.log(111111)

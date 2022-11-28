@@ -4,7 +4,21 @@
 
 import {matchData} from './extraFunctions.js'
 
+
+//Needed to have both import and requires in the same file
+import { Console } from "console";
+import {createRequire} from "module";
+const require = createRequire(import.meta.url);
+
+const fs = require('fs');
+
 export function createOntology(dataFile){
+
+//Resolver bug com o SNOMED no terminalogies available
+
+dataFile = dataFile.replace('<"SNOMED-CT", ...>', '<"SNOMED-CT">')
+dataFile = dataFile.replaceAll("<[", '"')
+dataFile = dataFile.replaceAll("]>", '"')
 
   //Resolução do bug com comentarios (remove os comentarios)
  
@@ -120,15 +134,33 @@ if(matchErro){
     }
     
 
+    //TERM BINDINGS
+
+    resultadoOntology = resultadoOntology.replace("term_bindings", ',"term_bindings"')
+
+
     return resultadoOntology
 
 }
   
 
-/*
-var resultado = createOntology(dataFile)
+/* var filename = "rascunho.txt"
+
+try {
+    const data = fs.readFileSync(filename, 'utf8')
+    filename = data
+  } catch (err) {
+    console.error(err)
+  }
+
+console.log(filename)
+var resultado = createOntology(filename)
 console.log(resultado)
+console.log(111111)
 resultado = JSON.parse(resultado)
+console.log(22222222)
+
+console.log(JSON.stringify(resultado))
 console.log(resultado)
 
-*/
+ */

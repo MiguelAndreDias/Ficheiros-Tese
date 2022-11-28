@@ -18,10 +18,17 @@ export function createDescription(dataFile){
       var regexDesc = new RegExp( descriptionProps[i] + ' = <[\\d\\D]*?>', 'g' ) 
      
       var matchKeywords = resultadoDescription.match(regexDesc)
-     
+     if (matchKeywords == null){
+
+     }
+     else{
+
+    
       for (var j=0 ; j < matchKeywords.length; j++) {
         resultadoDescription = resultadoDescription.replaceAll(matchKeywords[j], '')
       }
+
+    }
   
       
     }

@@ -11,7 +11,7 @@ export function createConcept(dataFile){
   resultadoConcept = resultadoConcept.replace('language','')
 
   resultadoConcept = resultadoConcept.replace(/concept/, '{' + '"concept"' + ':')
-  var regexAT = /\[at.+\]/
+  var regexAT = /\[at.+?\]/
   var matchAT = resultadoConcept.match(regexAT)
   matchAT = matchAT[0]
   matchAT = matchAT.replace("[", "")
