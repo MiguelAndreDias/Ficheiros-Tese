@@ -58,7 +58,7 @@ headers: new Headers({
 
 //Abrir ficheiros no diretorio
 
-export var filename = "rascunho.txt"
+export var filename = "Rascunho.txt"
 
 try {
     const data = fs.readFileSync(filename, 'utf8')

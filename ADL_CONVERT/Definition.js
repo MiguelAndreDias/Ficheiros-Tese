@@ -58,19 +58,13 @@ try {
 //CREATE ONTOLOGY TERMS
 ////////////////////////
 
-var rmType = ""
-
-var ontologyItems = `
-
-Sem conteudo por enquanto a função createallmatches vai criar este objecto
- para ser usado na scope global em todas as funções`
 
 
-var fileArray = []
+let fileArray = []
 
 
 
-function createNode(string){
+function createNode(string, ontologyItems){
 
     var objNode = {}
 
@@ -149,7 +143,7 @@ function createNode(string){
 
 
 
-function createDVCODED(string){
+function createDVCODED(string, ontologyItems){
 
 
     var objValue = {}
@@ -212,7 +206,7 @@ function createDVCODED(string){
 
 
 //Tambem dá para usar esta função com value matches ou outras que tenham apenas DV codes
-function createNameMatches(string){
+function createNameMatches(string, ontologyItems){
 
     var objName = {}
     var regexDV = /DV[\w]+/g
@@ -227,7 +221,7 @@ function createNameMatches(string){
         //Se for DVCODED_TEXT cria uma lista com os values e vai buscar os valores ao ontology
         if(matchDV[i] == "DV_CODED_TEXT"){
 
-           var objValue =  createDVCODED(string)
+           var objValue =  createDVCODED(string, ontologyItems)
 
          
 
@@ -270,7 +264,7 @@ function getRepository(rmType){
     var response = fetch(url + getRepoContent + rmType   , {
     headers: ({
         'Accept': 'application/vnd.github.v3+json',
-        'Authorization': 'Bearer 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',
+        'Authorization': 'Bearer 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',
         
         })
     });
@@ -282,14 +276,15 @@ function getRepository(rmType){
 
 
 
-function createItemsMatches(string, type = null){
+function createItemsMatches(string, type = null, ontologyItems){
 
     
     if(type == "CLUSTER"){
 
     }
     else{
-        var first = createNode(string)
+        
+        var first = createNode(string, ontologyItems)
    
     }
     
@@ -319,7 +314,7 @@ function createItemsMatches(string, type = null){
     else{
 
         for (var i = 0 ; i < matchElements.length; i++){
-            var element = createNode(matchElements[i])
+            var element = createNode(matchElements[i], ontologyItems)
            
             if(matchElements[i].includes("ELEMENT")){
                 var regexCode = /\[at.+\]/g 
@@ -332,9 +327,9 @@ function createItemsMatches(string, type = null){
 
                 else{
                   
-                    var objElement = createNode(matchElements[i])
+                    var objElement = createNode(matchElements[i], ontologyItems)
                
-                    var objELementValues = createNameMatches(matchElements[i])
+                    var objELementValues = createNameMatches(matchElements[i], ontologyItems)
 
                     objElement = {
                         ...objElement,
@@ -352,6 +347,7 @@ function createItemsMatches(string, type = null){
                 //INCLUDE ARCHETYPE
                 //////////////////
             else if(matchElements[i].includes("allow_archetype")){
+                
                 console.log("inclui archetype")
 
                 //Criar o path
@@ -361,7 +357,7 @@ function createItemsMatches(string, type = null){
              
    
                 //console.log(ontologyItems)
-                var nodeAllowArchetype = createNode(matchElements[i])
+                var nodeAllowArchetype = createNode(matchElements[i], ontologyItems)
                 nodeAllowArchetype["xsi_type"] = "C_ARCHETYPE_ROOT"
                 nodeAllowArchetype["include"] = []
 
@@ -371,6 +367,7 @@ function createItemsMatches(string, type = null){
                 //Ver o rm type do archetype a incluir
                 var regexRMtype = /(?<=openEHR-EHR-)\w+(?=\\\.)/
                 var rmType = matchElements[i].match(regexRMtype)
+                
                 
 
                 //Se não der match ignora o allow_archetype
@@ -451,19 +448,7 @@ function createItemsMatches(string, type = null){
               
                 //Resolve o bug do ontology items mudar após cada iteração
                 //Assim chama a função novamente e cria um objecto novo com os dados do ficheiro anterior/original
-                fileArray.push(fileinclude)
-                if(fileArray.length == 1){
-                    var previousFile = fileArray[0]
-                }
-                else{
-                    var previousFile = fileArray.pop()
-                }
-                
-                var objOntology = JSON.parse(createOntology(previousFile))
-                ontologyItems = objOntology.ontology.term_definitions.en.items
-
-                
-                
+               
                 /////////////////////////////////////
                 nodeAllowArchetype["include"].push(includeArch)
                 
@@ -487,7 +472,7 @@ function createItemsMatches(string, type = null){
                 
                 console.log("NEWCLUSTER HERE!!!!!!!!!!!!!!!!!!!!!")
                
-                var newCluster = createNode(matchElements[i])
+                var newCluster = createNode(matchElements[i], ontologyItems)
                 
                 
                 newCluster["items"] = [] 
@@ -508,9 +493,9 @@ function createItemsMatches(string, type = null){
                     listaCode += matchCode
                     //////////////////////////////////////////////////////////////////////
                     
-                    var objNewElement = createNode(matchClusterElements[j])
+                    var objNewElement = createNode(matchClusterElements[j], ontologyItems)
               
-                    var objELementValues = createNameMatches(matchClusterElements[j])
+                    var objELementValues = createNameMatches(matchClusterElements[j], ontologyItems)
 
                     objNewElement = {
                         ...objNewElement,
@@ -566,10 +551,12 @@ function createItemsMatches(string, type = null){
 
 
 
-function createDetailsMatches(string){
-    
+function createDetailsMatches(string, ontologyItems){
+    console.log("ola")
+    console.log(ontologyItems)
     var objDetails = {}
-    var objItemsDetails = createItemsMatches(string)
+    var objItemsDetails = createItemsMatches(string, null,  ontologyItems)
+    console.log("adeus")
     
 
     objDetails["details_matches"] = []
@@ -586,9 +573,9 @@ function createDetailsMatches(string){
 
 
 /* JUNTAR ESTAS FUNÇÕES!!!!! */
-function createProtocolMatches(string){
+function createProtocolMatches(string, ontologyItems){
     var objProtocol = {}
-    var objItemsDetails = createItemsMatches(string)
+    var objItemsDetails = createItemsMatches(string, null, ontologyItems)
     objProtocol["protocol matches"] = []
     objProtocol["protocol matches"].push(objItemsDetails)
 
@@ -596,9 +583,9 @@ function createProtocolMatches(string){
 }
 
 
-function createContextMatches(string){
+function createContextMatches(string, ontologyItems){
     var objContext = {}
-    var objItemsDetails = createItemsMatches(string)
+    var objItemsDetails = createItemsMatches(string, null, ontologyItems)
     objContext["context_matches"] = []
     objContext["context_matches"].push(objItemsDetails)
 
@@ -606,20 +593,10 @@ function createContextMatches(string){
 }
 
 
-var objMatchCheck = {
-    "name matches" : createNameMatches,
-    "category matches" : createNameMatches,
-    "details matches" : createDetailsMatches,
-    "description matches": createDetailsMatches,
-    "credentials matches" : createDetailsMatches,
-    "items matches" : createDetailsMatches,
-    "context matches" : createContextMatches,
-    "ism_transition matches" : createTransitionMatches,
-    "protocol matches" : createProtocolMatches
-  }
 
 
-function createTransitionMatches(string){
+
+function createTransitionMatches(string, ontologyItems){
 
     var objISMFinal = {}
     objISMFinal["ism_transition"] = []
@@ -628,7 +605,7 @@ function createTransitionMatches(string){
     var matchISM = string.match(regexISM)
 
     for(var i = 0; i < matchISM.length; i++){
-        var objNodeISM = createNode(matchISM[i])
+        var objNodeISM = createNode(matchISM[i], ontologyItems)
         
         //buscar os current_state e careflow_state
         var regexStateStep = /(current_state matches\s+{.+?}(?=\s+careflow_step matches|$))|(careflow_step matches[\d\D]+)/gs
@@ -640,7 +617,7 @@ function createTransitionMatches(string){
         var matchDV = matchStateStep[0].match(regexDV)
 
         if(matchDV == "DV_CODED_TEXT"){
-            var DVcoded = createDVCODED(matchStateStep[0])
+            var DVcoded = createDVCODED(matchStateStep[0], ontologyItems)
             objNodeISM["current_state"] = DVcoded
         }
         else{
@@ -650,7 +627,7 @@ function createTransitionMatches(string){
 
         matchDV = matchStateStep[1].match(regexDV)
         if(matchDV == "DV_CODED_TEXT"){
-            var DVcoded = createDVCODED(matchStateStep[1])
+            var DVcoded = createDVCODED(matchStateStep[1], ontologyItems)
             objNodeISM["careflow_step"] = DVcoded
         }
         else{
@@ -677,6 +654,18 @@ function removeMatches(string){
 }  
 
 
+var objMatchCheck = {
+    "name matches" : createNameMatches,
+    "category matches" : createNameMatches,
+    "details matches" : createDetailsMatches,
+    "description matches": createDetailsMatches,
+    "credentials matches" : createDetailsMatches,
+    "items matches" : createDetailsMatches,
+    "context matches" : createContextMatches,
+    "ism_transition matches" : createTransitionMatches,
+    "protocol matches" : createProtocolMatches
+  }
+
 
 //Função que procura os matches e depois chama as outras funções em função do tipo de match que é
 export function createAllMatches(string){
@@ -689,12 +678,16 @@ export function createAllMatches(string){
         }
       
         //Cria um objecto com os termos de Ontology 
-        var objOntology = JSON.parse(createOntology(string))
-        ontologyItems = objOntology.ontology.term_definitions.en.items
+        let objOntology = JSON.parse(createOntology(string))
+  
+        let ontologyItems = objOntology.ontology.term_definitions.en.items
+       
+    
+        
        
 
         if(JSON.stringify(objOntology).includes("constraint_definitions")){
-            var ontologyConstraints = objOntology.ontology.constraint_definitions.en.items
+            let ontologyConstraints = objOntology.ontology.constraint_definitions.en.items
             ontologyItems = {
                 ...ontologyConstraints,
                 ...ontologyItems
@@ -702,7 +695,7 @@ export function createAllMatches(string){
         }
 
 
-
+        console.log(ontologyItems)
         //Vai buscar só a parte do definition
         var regexDefinition = /definition[\w\W]*ontology/
         var matchDef = regexDefinition.exec(string)
@@ -710,9 +703,9 @@ export function createAllMatches(string){
 
         //Cria o primeiro node
         var firstNode = {}
-        firstNode = createNode(string)
+        firstNode = createNode(string, ontologyItems)
         
-        
+        console.log(firstNode)
        
         
         
@@ -745,16 +738,18 @@ export function createAllMatches(string){
             matchFinalType = matchFinalType[0]
 
             if(firstNode.rmType == "CLUSTER"){
-                
-                var objMatch = createItemsMatches(matchMaType[i], "CLUSTER")
+                console.log("olla")
+                var objMatch = createItemsMatches(matchMaType[i], "CLUSTER", ontologyItems)
             
             }
             else{
              
                 var matchesFunction = objMatchCheck[matchFinalType]
+                console.log(matchesFunction)
                
               
-                var objMatch = matchesFunction(matchMaType[i])
+                var objMatch = matchesFunction(matchMaType[i], ontologyItems)
+                console.log(objMatch)
 
                 
               

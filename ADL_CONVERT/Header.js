@@ -48,7 +48,7 @@ export function createHeader(dataFile){
 
 
 
-   var filename = "rascunho.txt"
+/*    var filename = "rascunho.txt"
 
 try {
     const data = fs.readFileSync(filename, 'utf8')
@@ -56,7 +56,7 @@ try {
   } catch (err) {
     console.error(err)
   }
-
+ */
 /* console.log(filename)
 var resultado = createHeader(filename)
 console.log(resultado)
